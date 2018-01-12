@@ -1,3 +1,10 @@
-console.log('Hello, world.');
-console.log('Testing. There we go.');
+import React, { Component } from 'react';
+import { render } from 'react-dom';
 
+class Hello extends Component {
+    render() {
+        return <p>Hello, world</p>
+    }
+}
+
+render(<Hello />, document.getElementById('app'));
