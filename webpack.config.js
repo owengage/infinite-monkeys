@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
     entry: './src/app.js',
@@ -13,4 +14,7 @@ module.exports = {
             { test: /\.js$/, loader: 'babel-loader', exclude: /node_modules/ },
         ],
     },
+    plugins: [
+        new webpack.IgnorePlugin(/^jsdom$/),
+    ],
 };

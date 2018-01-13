@@ -1,10 +1,5 @@
 import React, { Component } from 'react';
 import { render } from 'react-dom';
+import Paper from './paper';
 
-class Hello extends Component {
-    render() {
-        return <p>Hello, world</p>
-    }
-}
-
-render(<Hello />, document.getElementById('app'));
+render(<Paper />, document.getElementById('app'));
