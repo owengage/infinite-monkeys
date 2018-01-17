@@ -31,3 +31,26 @@ These are just rough notes.
   selection is required.
 * Add a modal when hyperlinking something so that we can actually link
   somewhere!
+* Make the current date automatically be above where you're typing. Maybe change
+  things so that typing produces `p` tags that have an attribute with the date
+  in, and do something clever with that.
+* Add in the ability to reference something else in the log. This will be the
+  groundwork to the tag functionality.
+
+## Ideas
+
+### References
+
+A core part of Oak should be self-reference. All complex functionality should
+try to reuse the concept of referencing other things. For example, to introduce
+tagging of arbitrary entries, those entries should 'reference' another part of
+the log. This other part of the log can be a 'tag'. 
+
+The tag exists in the log as text, rather than existing in some other location
+tracked by the application.  This means we could for example create 'people'
+structures and reference those if we have conversations or need to remember
+something about somebody.
+
+There will then be flexible ways of finding, editing, and searching these
+references. For example making views that only contain things that reference
+something.
