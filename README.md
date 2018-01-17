@@ -20,3 +20,14 @@ I'll be using the `contenteditable` attribute to create rich-text editing, and
 generally taking advantage of as many modern web APIs as possible. I don't have
 an intention at the moment to use an established framework such as Angular,
 React or Vue.
+
+## TODOs
+
+These are just rough notes.
+
+* Don't pass the result of `window.getSelection()` around. It's a global thing
+  and nothing good is going to come of lots of things editing it with no contol.
+  Pass a range around instead and make `Paper` determine if a change to
+  selection is required.
+* Add a modal when hyperlinking something so that we can actually link
+  somewhere!
