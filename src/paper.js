@@ -1,4 +1,3 @@
-import React, { Component } from 'react';
 import { transformTextNode } from './hyperlinks';
 
 function getNodeTypeString(node) {
@@ -79,30 +78,27 @@ function debugSelectionInfo(e) {
     console.log('node:', node, 'offset:', offset);
 }
 
-export default class Paper extends Component {
-    render() {
-        return <div 
-                onInput={this.handleInput}
-                //onKeyDown={this.handleKeyDown}
-                onSelect={this.handleSelectionChange}
-                contentEditable={true}>
-            Edit <a href='#'>me</a> test.
-        </div>;
+export default class Paper {
+    constructor(container) {
+        const hw = window.document.createTextNode('Hello, world!');
+        container.appendChild(hw);
+
+        container.setAttribute('contenteditable', true);
+        container.addEventListener('input', this.handleInput);
+        container.addEventListener('selectionchange', this.handleSelectionChange);
+        container.addEventListener('keydown', this.handleKeyDown);
     }
 
     handleKeyDown(e) {
         console.log('key pressed');
     }
-    
+
     handleSelectionChange(e) {
         console.log('selection changed');
         debugSelectionInfo(e);
     }
 
     handleInput(e) {
-        e.persist();
-        //console.log(e);
-
         console.log('Printing child nodes');
         for (const node of e.target.childNodes) {
             console.log({node});
@@ -122,5 +118,4 @@ export default class Paper extends Component {
         const selection = window.getSelection();
         console.log(selection.anchorOffset);
     }
-}
-
+};
