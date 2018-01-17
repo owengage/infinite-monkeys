@@ -26,21 +26,87 @@ function linkTest(target) {
     }
 }
 
+/**
+ * Get the total text offset from the start of the container node of the given selection.
+ */ 
+function textOffsetFromDomOffset(container, domOffset) {
+    let offset = 0;
+    let it = document.createNodeIterator(container, NodeFilter.SHOW_TEXT);
+    let node;
+    while (node = it.nextNode()) {
+        if (node.isSameNode(domOffset.node)) {
+            return offset + domOffset.offset;
+        }
+        offset += node.data.length;
+    }
+}
+
+/**
+ * Find the node and offset within that node that would be find if counting the
+ * characters in the entire cotnainer.
+ * 
+ * returns { node, offset }
+ */
+function domOffsetFromTextOffset(container, textOffset) {
+    let currentOffset = 0;
+    let it = document.createNodeIterator(container, NodeFilter.SHOW_TEXT);
+    let node;
+    let lastNode; // if we run off the end, we need to remember the last text node.
+
+    while (node = it.nextNode()) {
+        if (currentOffset + node.data.length > textOffset) {
+            return { node, offset: textOffset - currentOffset };
+        }
+        currentOffset += node.data.length;
+        lastNode = node;
+    }
+
+    return { node: lastNode, offset: lastNode.data.length };
+}
+
+function debugSelectionInfo(e) {
+    const selection = window.getSelection();
+
+    let cursorLeft = textOffsetFromDomOffset(e.target, {
+        node: selection.anchorNode, 
+        offset: selection.anchorOffset
+    });
+
+    // Get the node back for sanity check.
+    let { node, offset } = domOffsetFromTextOffset(e.target, cursorLeft);
+
+    console.log('left:', cursorLeft);
+    console.log('node:', node, 'offset:', offset);
+}
+
 export default class Paper extends Component {
     render() {
-        return <div onInput={this.handleInput} contentEditable={true}>
+        return <div 
+                onInput={this.handleInput}
+                //onKeyDown={this.handleKeyDown}
+                onSelect={this.handleSelectionChange}
+                contentEditable={true}>
             Edit <a href='#'>me</a> test.
         </div>;
+    }
+
+    handleKeyDown(e) {
+        console.log('key pressed');
+    }
+    
+    handleSelectionChange(e) {
+        console.log('selection changed');
+        debugSelectionInfo(e);
     }
 
     handleInput(e) {
         e.persist();
         //console.log(e);
 
-        //console.log('Printing child nodes');
-        //for (const node of e.target.childNodes) {
-        //    console.log({node});
-        //}        
+        console.log('Printing child nodes');
+        for (const node of e.target.childNodes) {
+            console.log({node});
+        }        
 
         linkTest(e.target);
 
@@ -52,6 +118,9 @@ export default class Paper extends Component {
 //        sel.removeAllRanges();
 //        sel.addRange(range);
 //        el.focus();
+
+        const selection = window.getSelection();
+        console.log(selection.anchorOffset);
     }
 }
 
