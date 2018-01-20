@@ -13,8 +13,8 @@ This is no where near done.
 ## Technologies
 
 At the moment I intend for the note taking application to be entirely a
-web-frontend. Once enough functionality has been developed I will figure out
-some way of saving content to a server or local machine.
+web-frontend. It uses the local storage Web API to niavely persist state across
+sessions. Not a permanent solution, but good enough for some development.
 
 I'll be using the `contenteditable` attribute to create rich-text editing, and
 generally taking advantage of as many modern web APIs as possible. I don't have
