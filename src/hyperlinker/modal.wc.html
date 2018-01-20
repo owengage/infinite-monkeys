@@ -1,0 +1,72 @@
+<style>
+    .oak-hyperlinker-curtain {
+        display: block;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.3);
+    }
+
+    .oak-hyperlinker-modal {
+        background-color: #fcfcfc;
+        margin: 15% 10%;
+        padding: 20px;
+        border-radius: 3px;
+        border: 1px solid #888;
+        box-shadow: 5px 8px rgba(0,0,0,0.4);
+    }
+
+    .oak-hyperlinker-modal > h1 {
+        margin: 0;
+        padding: 0;
+        font-size: 1.5em;
+        color: black;
+        font-variant: small-caps;    
+    }
+
+    .oak-hyperlinker-modal form > div {
+        margin: 1em 0;
+    }
+
+    .oak-hyperlinker-modal label {
+        display: block;
+        font-variant: small-caps;    
+    }
+
+    .oak-hyperlinker-modal input {
+        width: 100%;
+    }
+
+    .oak-hyperlinker-modal .buttons {
+        text-align: right;
+    }
+    .oak-hyperlinker-modal .buttons input {
+        display: inline-block;
+        width: auto;
+    }
+</style>
+
+<div class="oak-hyperlinker-curtain curtain">
+    <div class="oak-hyperlinker-modal">
+        <h1>Add hyperlink</h1>
+        <form>
+            <div>
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="link_title">
+            </div>
+            <div>
+                <label for="url">URL:</label>
+                <input type="text" id="url" name="link_url">
+            </div>
+            <div class="buttons">
+                <input type="submit" value="Okay">
+                <input type="button" id="cancel" value="Cancel">
+            </div>
+        </form>
+    </div>
+</div>
+

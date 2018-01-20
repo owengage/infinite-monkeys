@@ -8,13 +8,30 @@ export default class Paper {
         const hw = window.document.createTextNode('Hello, world!');
         container.appendChild(hw);
 
-        container.setAttribute('contenteditable', true);
-        container.addEventListener('input', this.handleInput.bind(this));
-        container.addEventListener('keydown', this.handleKeyDown.bind(this));
-        
+        const pluginLoadings = [];
+
         for (const plugin of plugins) {
-            plugin.registerWith(this);
+            const name = plugin.constructor.name;
+            console.info('Loading', name);
+            pluginLoadings.push(
+                plugin
+                    .registerWith(this)
+                    .then(() => console.info('Loaded', name))
+            );
         }
+
+        Promise.all(pluginLoadings).then(() => {
+            console.info('Loaded all plug-ins for Paper');
+            container.setAttribute('contenteditable', true);
+            container.addEventListener('input', this.handleInput.bind(this));
+            container.addEventListener('keydown', this.handleKeyDown.bind(this));
+        }).catch(e => {
+            console.error('Failed to load all plug-ins for Paper', e);
+        });
+    }
+
+    getContainer() {
+        return this.container;
     }
 
     addKeyboardShortcut(shortcutKey, callback) {
@@ -37,10 +54,12 @@ export default class Paper {
 
                 if (_.isEqual(attempted, registered)) {
                     const selection = window.getSelection();
+                
                     e.preventDefault();
                     const cursor = shortcut.callback({
                         container: this.container,
-                        currentSelection: selection,
+                        selectedRange: selection.getRangeAt(0),
+                        originalEvent: e,
                     });                    
 
                     if (cursor) {
