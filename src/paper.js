@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import KeyCombination from './key-combination';
 
 export default class Paper {
     constructor(container, plugins) {
@@ -39,40 +39,33 @@ export default class Paper {
     }
 
     handleKeyDown(e) {
-        const base = { ctrlKey: false, altKey: false, shiftKey: false, metaKey: false };
-        const attempted = { 
-            ctrlKey: e.ctrlKey, 
-            altKey: e.altKey,
-            shiftKey: e.shiftKey,
-            metaKey: e.metaKey,
-            key: e.key
-        };
+        if (this.handleShortcutKey(e)) {
+            return;
+        }
 
-        if (attempted.ctrlKey || attempted.shiftKey || attempted.altKey || attempted.metaKey) {
-            for (const shortcut of this.shortcuts) {
-                const registered = { ...base, ...shortcut.shortcutKey};
-
-                if (_.isEqual(attempted, registered)) {
-                    const selection = window.getSelection();
-                
-                    e.preventDefault();
-                    const cursor = shortcut.callback({
-                        container: this.container,
-                        selectedRange: selection.getRangeAt(0),
-                        originalEvent: e,
-                    });                    
-
-                    if (cursor) {
-                        selection.removeAllRanges();
-                        selection.addRange(cursor);
-                    }
-                }
-            }
+        if (e.key === 'Enter') {
+            console.log('enter pressed', e);
         }
     }
 
-    // A selection that begins and ends in our container.
+    handleShortcutKey(e) {
+        const attempted = KeyCombination.fromEvent(e);
 
+        if (attempted.hasModifier()) {
+            for (const shortcut of this.shortcuts) {
+                if (attempted.equals(shortcut.shortcutKey)) {
+                    shortcut.callback({
+                        container: this.container,
+                        selectedRange: window.getSelection().getRangeAt(0),
+                        originalEvent: e,
+                    });                    
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 
     handleSelectionChange(e) {
     }

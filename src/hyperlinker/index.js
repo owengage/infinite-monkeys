@@ -1,4 +1,5 @@
 import modalSource from './modal.html';
+import KeyCombination from '../key-combination';
 import { isTextNode, isElementNode, deferFocus, setCursor } from '../node-utils';
 
 function isInsideLink(root, node) {
@@ -15,11 +16,10 @@ function isInsideLink(root, node) {
 
 export default class Hyperlinker {
     constructor() {
-        this.keyboardShortcut = {
-            ctrlKey: true,
+        this.keyboardShortcut = new KeyCombination({
+            ctrl: true,
             key: 'k',
-        };
-
+        });
     }
 
     registerWith(paper) {
@@ -130,8 +130,9 @@ export default class Hyperlinker {
         return this.modalElement.getRootNode() === document;
     }
     
-    trigger({ selectedRange }) {
-        
+    trigger({ selectedRange, originalEvent }) {
+        originalEvent.preventDefault();
+
         // If the modal is already showing ignore a trigger.
         if (this.isModalShowing()) {
             return;
@@ -149,7 +150,7 @@ export default class Hyperlinker {
                 selectedRange
             });
         } else {
-            console.info('Selection was not valid for a hyperlink.');
+            console.info('Selection was not valid for a hyperlink.', selectedRange);
         }
     }
 
