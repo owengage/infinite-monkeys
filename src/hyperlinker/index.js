@@ -1,7 +1,5 @@
-import window from '../window';
-
-import modalPath from './modal.wc.html';
-import { isTextNode, isElementNode, deferFocus } from '../node-utils';
+import modalSource from './modal.html';
+import { isTextNode, isElementNode, deferFocus, setCursor } from '../node-utils';
 
 function isInsideLink(root, node) {
     let current = node;
@@ -35,20 +33,10 @@ export default class Hyperlinker {
 
     init() {
         return new Promise((resolve, reject) => {
-            const link = window.document.createElement('link');
-            link.rel = 'import';
-            link.href = modalPath;
-            link.onload = e => {
-                this.modalElement = link.import.body
-                this.initModal();
-                resolve();
-            };
-            link.onerror = e => {
-                reject();
-            };
-
-            // Cause download of our HTML.
-            window.document.head.appendChild(link);
+            this.modalElement = window.document.createElement('div');
+            this.modalElement.innerHTML = modalSource;
+            this.initModal();
+            resolve();
         });
     }
 
@@ -68,7 +56,6 @@ export default class Hyperlinker {
         };
 
         this.curtainListener = e => {
-            console.log('curtain listen');
             if (e.target === curtain) {
                 this.onCancel();
             }
@@ -80,35 +67,37 @@ export default class Hyperlinker {
         this.hideModal();
     }
 
+    getUrlEl() {
+        return this.modalElement.querySelector('input[name=link_url]'); 
+    }
+
+    getTitleEl() {
+        return this.modalElement.querySelector('input[name=link_title]');
+    }
+
     onSubmit(e) {
         e.preventDefault();
+        const { startContainer, startOffset, endOffset } = this.linkRange;
 
-        const formUrl = this.modalElement.querySelector('input[name=link_url]').value;
-        const formTitle = this.modalElement.querySelector('input[name=link_title]').value;
-
-        const { startContainer, startOffset, endContainer, endOffset } = this.linkRange;
-        const node = startContainer;
-        const left = Math.min(startOffset, endOffset);
-        const right = Math.max(startOffset, endOffset);
-
-        const linkText = node.splitText(left);
-        const trailingText = linkText.splitText(right - left);
-
+        const linkText = startContainer.splitText(startOffset);
+        const trailingText = linkText.splitText(endOffset - startOffset);
         linkText.remove(); 
 
-        const a = window.document.createElement('a');
-        a.setAttribute('href', formUrl);
-        a.appendChild(document.createTextNode(formTitle));
+        const a = this.createLink(
+            this.getTitleEl().value,
+            this.getUrlEl().value);
 
-        this.container.insertBefore(a, trailingText); 
+        trailingText.before(a); 
+
         this.hideModal();
+        setCursor(trailingText, 0);
+    }
 
-        const newRange = document.createRange();
-        newRange.setStart(trailingText, 0);
-        newRange.setEnd(trailingText, 0);
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(newRange);
+    createLink(title, url) {
+        const a = window.document.createElement('a');
+        a.setAttribute('href', url);
+        a.appendChild(document.createTextNode(title));
+        return a;
     }
 
     showModal({ selectedRange }) {
@@ -118,10 +107,10 @@ export default class Hyperlinker {
         this.linkRange = selectedRange;
 
         const title = selectedRange.toString();
-        const titleEl = this.modalElement.querySelector('input[name=link_title]');
+        const titleEl = this.getTitleEl();
 
         if (title) {
-            const urlEl = this.modalElement.querySelector('input[name=link_url]');
+            const urlEl = this.getUrlEl();
             titleEl.value = title;
             deferFocus(urlEl);
         } else {

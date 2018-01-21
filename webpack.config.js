@@ -19,11 +19,12 @@ module.exports = {
             { test: /\.js$/, loader: 'babel-loader', exclude: /node_modules/ },
 
             /**
-             * This is how I've decided to combine a lite version of web
-             * components with Webpack. The file loader just gives us the path
-             * to the file in `dist`. This lets us load it like a web component.
+             * I wanted to use HTML imports to import HTML for my various
+             * plugins but currently browsers don't agree on what these should
+             * look like and therefore don't support them. For now we'll just
+             * use the HTML loader to essentially load them in as strings. Ew.
              */
-            { test: /\.wc.html$/, loader: 'file-loader', exclude: /node_modules/ },
+            { test: /\.html$/, loader: 'html-loader', exclude: /node_modules/ },
 
         ],
     },

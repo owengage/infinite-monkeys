@@ -16,3 +16,12 @@ export function deferFocus(element) {
         element.focus();
     }, 0);
 }
+
+export function setCursor(node, offset) {
+    const newRange = document.createRange();
+    newRange.setStart(node, offset);
+    newRange.setEnd(node, offset);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(newRange);
+}
