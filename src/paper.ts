@@ -1,7 +1,23 @@
 import KeyCombination from './key-combination';
 
+export interface PluginCallbackParams {
+    container: Element;
+    selectedRange: Range;
+    originalEvent: Event;
+}
+
+export interface ShortcutAction {
+    shortcutKey: KeyCombination;
+    callback(p: PluginCallbackParams): void;
+}
+
+export interface Plugin {
+    registerWith(paper: Paper): Promise<void>;
+    trigger?(params: PluginCallbackParams): void;
+}
+
 export default class Paper {
-    constructor(container, plugins) {
+    constructor(container: Element, plugins: Plugin[]) {
         this.container = container;
         this.shortcuts = [];
 
@@ -22,7 +38,7 @@ export default class Paper {
 
         Promise.all(pluginLoadings).then(() => {
             console.info('Loaded all plug-ins for Paper');
-            container.setAttribute('contenteditable', true);
+            container.setAttribute('contenteditable', 'true');
             container.addEventListener('input', this.handleInput.bind(this));
             container.addEventListener('keydown', this.handleKeyDown.bind(this));
         }).catch(e => {
@@ -34,11 +50,11 @@ export default class Paper {
         return this.container;
     }
 
-    addKeyboardShortcut(shortcutKey, callback) {
+    addKeyboardShortcut(shortcutKey: KeyCombination, callback: (p:PluginCallbackParams) => void) {
         this.shortcuts.push({ shortcutKey, callback });        
     }
 
-    handleKeyDown(e) {
+    handleKeyDown(e: KeyboardEvent) {
         if (this.handleShortcutKey(e)) {
             return;
         }
@@ -48,7 +64,7 @@ export default class Paper {
         }
     }
 
-    handleShortcutKey(e) {
+    handleShortcutKey(e: KeyboardEvent) {
         const attempted = KeyCombination.fromEvent(e);
 
         if (attempted.hasModifier()) {
@@ -67,9 +83,12 @@ export default class Paper {
         return false;
     }
 
-    handleSelectionChange(e) {
+    handleSelectionChange(e: Event) {
     }
 
-    handleInput(e) {
+    handleInput(e: Event) {
     }
+
+    container: Element;
+    shortcuts: ShortcutAction[];
 };

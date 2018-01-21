@@ -1,6 +1,6 @@
-export const isNodeType = (node, type) => node.nodeType === type;
-export const isTextNode = node => isNodeType(node, Node.TEXT_NODE);
-export const isElementNode = node => isNodeType(node, Node.ELEMENT_NODE);
+export const isNodeType = (node: Node, type: number) => node.nodeType === type;
+export const isTextNode = (node: Node) => isNodeType(node, Node.TEXT_NODE);
+export const isElementNode = (node: Node) => isNodeType(node, Node.ELEMENT_NODE);
 
 
 /**
@@ -11,13 +11,13 @@ export const isElementNode = node => isNodeType(node, Node.ELEMENT_NODE);
  * actually been put into the DOM yet. By setting a zero timeout it gets
  * deferred until the current queue is cleared (I believe).
  */
-export function deferFocus(element) {
+export function deferFocus(element: HTMLElement) {
     setTimeout(() => {
         element.focus();
     }, 0);
 }
 
-export function setCursor(node, offset) {
+export function setCursor(node: Node, offset: number) {
     const newRange = document.createRange();
     newRange.setStart(node, offset);
     newRange.setEnd(node, offset);

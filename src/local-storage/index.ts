@@ -1,9 +1,11 @@
+import Paper from '../paper';
+
 export default class LocalStorageSaver {
     constructor() {
         this.key = 'oak-local-storage-saver';
     }
 
-    registerWith(paper) {
+    registerWith(paper: Paper) {
         this.container = paper.getContainer();
 
         window.addEventListener('beforeunload', e => {
@@ -19,4 +21,6 @@ export default class LocalStorageSaver {
         this.container.innerHTML = localStorage.getItem(this.key);
     }
 
+    container: Element;
+    key: string;
 };

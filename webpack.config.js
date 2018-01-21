@@ -2,13 +2,13 @@ const path = require('path');
 const webpack = require('webpack');
 
 module.exports = {
-    entry: './src/app.js',
+    entry: './src/app.ts',
     output: {
         path: path.join(__dirname, '/dist'),
         filename: 'bundle.js',
         publicPath: 'dist',
     },
-    devtool: "sourcemap",
+    devtool: "inline-source-map",
     module: {
         rules: [
 
@@ -19,6 +19,11 @@ module.exports = {
             { test: /\.js$/, loader: 'babel-loader', exclude: /node_modules/ },
 
             /**
+             * Typescript compilation.
+             */
+            { test: /\.ts$/, loader: 'ts-loader', exclude: /node_modules/ },
+
+            /**
              * I wanted to use HTML imports to import HTML for my various
              * plugins but currently browsers don't agree on what these should
              * look like and therefore don't support them. For now we'll just
@@ -27,6 +32,11 @@ module.exports = {
             { test: /\.html$/, loader: 'html-loader', exclude: /node_modules/ },
 
         ],
+    },
+    resolve: {
+        // This means we don't have to specify the extension when importing
+        // files with these extensions. Explicit to add TypeScript files.
+        extensions: [ '.js', '.ts' ],
     },
     plugins: [
         /**

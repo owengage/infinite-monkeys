@@ -1,12 +1,14 @@
-import modalSource from './modal.html';
+import Paper, { Plugin, PluginCallbackParams } from '../paper';
 import KeyCombination from '../key-combination';
-import { isTextNode, isElementNode, deferFocus, setCursor } from '../node-utils';
+import { isTextNode, deferFocus, setCursor } from '../node-utils';
 
-function isInsideLink(root, node) {
-    let current = node;
+import modalSource from './modal.html';
+
+function isInsideLink(root: Node, node: Node) {
+    let current: Node = node;
 
     while ((current = current.parentNode) !== root) {
-        if (isElementNode(current) && current.tagName === 'A') {
+        if (current instanceof Element && current.tagName === 'A') {
             return true;
         }
     }
@@ -14,7 +16,7 @@ function isInsideLink(root, node) {
     return false;
 }
 
-export default class Hyperlinker {
+export default class Hyperlinker implements Plugin {
     constructor() {
         this.keyboardShortcut = new KeyCombination({
             ctrl: true,
@@ -22,7 +24,7 @@ export default class Hyperlinker {
         });
     }
 
-    registerWith(paper) {
+    registerWith(paper: Paper) {
         this.container = paper.getContainer();
         paper.addKeyboardShortcut(
             this.keyboardShortcut,
@@ -32,7 +34,7 @@ export default class Hyperlinker {
     }
 
     init() {
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             this.modalElement = window.document.createElement('div');
             this.modalElement.innerHTML = modalSource;
             this.initModal();
@@ -44,7 +46,7 @@ export default class Hyperlinker {
         const modal = this.modalElement;
         const curtain = modal.querySelector('.curtain');
         const form = modal.querySelector('form');
-        const cancel = form.querySelector('#cancel');
+        const cancel = form.querySelector('#cancel') as HTMLElement;
 
         form.onsubmit = this.onSubmit.bind(this);
         cancel.onclick = this.onCancel.bind(this);
@@ -67,40 +69,45 @@ export default class Hyperlinker {
         this.hideModal();
     }
 
-    getUrlEl() {
+    getUrlEl() : HTMLInputElement {
         return this.modalElement.querySelector('input[name=link_url]'); 
     }
 
-    getTitleEl() {
+    getTitleEl() : HTMLInputElement {
         return this.modalElement.querySelector('input[name=link_title]');
     }
 
-    onSubmit(e) {
+    onSubmit(e: Event) {
         e.preventDefault();
-        const { startContainer, startOffset, endOffset } = this.linkRange;
+        const { startOffset, endOffset } = this.linkRange;
+        const startContainer = this.linkRange.startContainer;
 
-        const linkText = startContainer.splitText(startOffset);
-        const trailingText = linkText.splitText(endOffset - startOffset);
-        linkText.remove(); 
+        if (startContainer instanceof Text) {
+            const linkText = startContainer.splitText(startOffset);
+            const trailingText = linkText.splitText(endOffset - startOffset);
+            linkText.remove(); 
 
-        const a = this.createLink(
-            this.getTitleEl().value,
-            this.getUrlEl().value);
+            const a = this.createLink(
+                this.getTitleEl().value,
+                this.getUrlEl().value);
 
-        trailingText.before(a); 
+            trailingText.before(a); 
 
-        this.hideModal();
-        setCursor(trailingText, 0);
+            this.hideModal();
+            setCursor(trailingText, 0);
+        } else {
+            console.error('Tried to turn non-text into hyperlink.');
+        }
     }
 
-    createLink(title, url) {
+    createLink(title: string, url: string) {
         const a = window.document.createElement('a');
         a.setAttribute('href', url);
         a.appendChild(document.createTextNode(title));
         return a;
     }
 
-    showModal({ selectedRange }) {
+    showModal(selectedRange: Range) {
         window.addEventListener('keydown', this.escListener);
         window.addEventListener('click', this.curtainListener);
         document.body.appendChild(this.modalElement);
@@ -130,7 +137,7 @@ export default class Hyperlinker {
         return this.modalElement.getRootNode() === document;
     }
     
-    trigger({ selectedRange, originalEvent }) {
+    trigger({selectedRange, originalEvent}: PluginCallbackParams) {
         originalEvent.preventDefault();
 
         // If the modal is already showing ignore a trigger.
@@ -146,16 +153,21 @@ export default class Hyperlinker {
             && isTextNode(startContainer)
             && ! isInsideLink(this.container, startContainer)) {
 
-            this.showModal({
-                selectedRange
-            });
+            this.showModal(selectedRange);
         } else {
             console.info('Selection was not valid for a hyperlink.', selectedRange);
         }
     }
 
-    rangeInsideContainer(range) {
+    rangeInsideContainer(range: Range) {
        return this.container.contains(range.startContainer)
             && this.container.contains(range.endContainer);
     }
+
+    keyboardShortcut: KeyCombination;
+    container: Element;
+    modalElement: Element;
+    curtainListener: (e:Event) => void;
+    escListener: (e: KeyboardEvent) => void;
+    linkRange: Range | null;
 }
