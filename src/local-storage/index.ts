@@ -1,6 +1,6 @@
-import Paper from '../paper';
+import Paper, { Plugin } from '../paper';
 
-export default class LocalStorageSaver {
+export default class LocalStorageSaver implements Plugin {
     constructor() {
         this.key = 'oak-local-storage-saver';
     }
@@ -18,7 +18,13 @@ export default class LocalStorageSaver {
     }; 
 
     load() {
-        this.container.innerHTML = localStorage.getItem(this.key);
+        const dom = localStorage.getItem(this.key);
+        if (dom) {
+            this.container.innerHTML = dom;
+        } else {
+            console.info('LocalStorageSaver: No previous save. Making new one.');
+            this.container.innerHTML = 'Hello, world!';
+        }
     }
 
     container: Element;

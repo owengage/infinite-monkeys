@@ -5,9 +5,9 @@ import { isTextNode, deferFocus, setCursor } from '../node-utils';
 import modalSource from './modal.html';
 
 function isInsideLink(root: Node, node: Node) {
-    let current: Node = node;
+    let current: Node | null = node;
 
-    while ((current = current.parentNode) !== root) {
+    while ((current = current && current.parentNode) !== root) {
         if (current instanceof Element && current.tagName === 'A') {
             return true;
         }
@@ -45,8 +45,13 @@ export default class Hyperlinker implements Plugin {
     initModal() {
         const modal = this.modalElement;
         const curtain = modal.querySelector('.curtain');
-        const form = modal.querySelector('form');
-        const cancel = form.querySelector('#cancel') as HTMLElement;
+
+        const form = this.getForm();
+
+        const cancel = form.querySelector('#cancel');
+        if (!(cancel && curtain && cancel instanceof HTMLElement)) {
+            throw new Error('Invalid pop-up');
+        }
 
         form.onsubmit = this.onSubmit.bind(this);
         cancel.onclick = this.onCancel.bind(this);
@@ -64,21 +69,41 @@ export default class Hyperlinker implements Plugin {
         };
     }
 
+    getForm() : HTMLFormElement
+    {
+        const form = this.modalElement.querySelector('form');
+        if (!(form && form instanceof HTMLElement)) {
+            throw new Error('Form not found');
+        }
+        return form;
+    }
+
     onCancel() {
-        this.modalElement.querySelector('form').reset();
+        this.getForm().reset();
         this.hideModal();
     }
 
     getUrlEl() : HTMLInputElement {
-        return this.modalElement.querySelector('input[name=link_url]'); 
+        const urlEl = this.modalElement.querySelector('input[name=link_url]');
+        if (!(urlEl && urlEl instanceof HTMLInputElement)) {
+            throw new Error('Form URL input field invalid.');
+        }
+        return urlEl;
     }
 
     getTitleEl() : HTMLInputElement {
-        return this.modalElement.querySelector('input[name=link_title]');
+        const titleEl = this.modalElement.querySelector('input[name=link_title]');
+        if (!(titleEl && titleEl instanceof HTMLInputElement)) {
+            throw new Error('Form title input field invalid.');
+        }
+        return titleEl;
     }
 
     onSubmit(e: Event) {
         e.preventDefault();
+        if (!this.linkRange) {
+            throw new Error('linkRange not set during submit.');
+        }
         const { startOffset, endOffset } = this.linkRange;
         const startContainer = this.linkRange.startContainer;
 
@@ -126,7 +151,7 @@ export default class Hyperlinker implements Plugin {
     }
 
     hideModal() {
-        this.modalElement.querySelector('form').reset();
+        this.getForm().reset();
         this.linkRange = null;
         window.removeEventListener('keydown', this.escListener);
         window.removeEventListener('click', this.curtainListener);
