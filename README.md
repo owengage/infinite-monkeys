@@ -1,7 +1,7 @@
-# Oak logbook
+# Infinite Monkeys
 
-Oak is a personal experiment to create a log book for taking daily or diary like
-notes.
+Infinite Monkeys is a personal experiment to create a log book for taking daily
+or diary like notes.
 
 All other note taking software I have used falls massively short of what I want
 from a note-taking application. Most offer fancy rich text editing, and maybe

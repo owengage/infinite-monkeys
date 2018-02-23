@@ -2,7 +2,7 @@ import Paper, { Plugin } from '../paper';
 
 export default class LocalStorageSaver implements Plugin {
     constructor() {
-        this.key = 'oak-local-storage-saver';
+        this.key = 'infinite-monkeys-dom';
     }
 
     registerWith(paper: Paper) {
