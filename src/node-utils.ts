@@ -2,7 +2,6 @@ export const isNodeType = (node: Node, type: number) => node.nodeType === type;
 export const isTextNode = (node: Node) => isNodeType(node, Node.TEXT_NODE);
 export const isElementNode = (node: Node) => isNodeType(node, Node.ELEMENT_NODE);
 
-
 /**
  * Focus on an element. Works for elements just appended to the DOM.
  *

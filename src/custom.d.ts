@@ -7,6 +7,10 @@ interface Node {
     getRootNode(): Node;
 }
 
+interface Window {
+    createDocumentFragment(): DocumentFragment
+}
+
 interface ChildNode {
     before(n: Node): void;
 }

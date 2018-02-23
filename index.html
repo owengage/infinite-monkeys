@@ -4,12 +4,26 @@
 		<meta charset="utf-8">
 		<title>Oak</title>
         <style>
-            #paper {
-                border: 1px gray dashed;
-                padding: 0.3rem;
-            }
             #paper:focus {
                 outline-style: none;
+            }
+            #paper p:before {
+                content: 'p';
+                font-size: 0.5em;
+                color: #999;
+                float: right;
+            }
+            #paper p {
+                border-right: 1px dashed #999;
+            }
+            #paper div:before {
+                content: 'div';
+                font-size: 0.5em;
+                color: #999;
+                float: right;
+            }
+            #paper div {
+                border-right: 1px dashed #999;
             }
         </style>
 	</head>

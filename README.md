@@ -43,3 +43,7 @@ the DOM (Everything is DOM), and be referenced in order to tag that location.
 The tag, that exists in the DOM, can then have arbitrary DOM around it to allow
 things like filtering all things with or without that tag, or deleting it and so
 on.
+
+## Testing
+
+You can run the tests in watch mode using `./watch-tests.sh`.

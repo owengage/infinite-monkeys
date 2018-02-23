@@ -1,4 +1,5 @@
 import KeyCombination from './key-combination';
+import { setCursor } from './node-utils';
 
 export interface PluginCallbackParams {
     container: Element;
@@ -54,13 +55,74 @@ export default class Paper {
         this.shortcuts.push({ shortcutKey, callback });        
     }
 
+    currentParagraph(): HTMLElement {
+        // Fix case where selection is null somehow.
+        const selection = window.getSelection();
+        let current: Node = selection!.anchorNode;
+        let last = current;
+
+        while ((current = current.parentNode!) !== this.container) {
+            last = current;
+        }
+
+        if (last instanceof HTMLElement) {
+            return last;
+        } else {
+            throw new Error('Tried to add paragraph, but top level node was not an element.'); 
+        }
+    }
+
+    /**
+     * Split the paragraph currently selected at the selection point.
+     */
+    splitCurrentParagraph(): void {
+        const currentPara = this.currentParagraph();
+
+        // What about text after the cursor? Wants to be moved to the next
+        // paragraph.
+        //
+        // Steps:
+        // 1. Create new paragraph tag after current.
+        // 2. Split current text node.
+        // 3. Move all nodes after the split point to the new paragraph.
+        // 4. Add a <br/> tag if no nodes were moved.
+
+        const newPara = document.createElement('p');
+
+        const selection = window.getSelection();
+
+        if (!selection) {
+            return; // not actually looking at a paragraph.
+        }
+
+        const selectedNode = selection.anchorNode;
+
+        if (!(selectedNode instanceof Text)) {
+            throw new Error('Expected current node to be a text node.');
+        }
+
+        const startNode = selectedNode.splitText(selection.anchorOffset);
+
+
+        const br = document.createElement('br');
+        newPara.appendChild(br);
+        currentPara.insertAdjacentElement('afterend', newPara);
+        setCursor(newPara, 0);
+    }
+
     handleKeyDown(e: KeyboardEvent) {
         if (this.handleShortcutKey(e)) {
             return;
         }
 
-        if (e.key === 'Enter') {
-            console.log('enter pressed', e);
+        const keyCombo = KeyCombination.fromEvent(e);
+
+        if (!keyCombo.hasModifier()) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.splitCurrentParagraph();
+                return;
+            }
         }
     }
 
