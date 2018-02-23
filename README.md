@@ -46,4 +46,5 @@ on.
 
 ## Testing
 
-You can run the tests in watch mode using `./watch-tests.sh`.
+You can run the tests using `./run-tests.sh`. You can pass extra flags to mocha,
+so you can watch test files by doing `./run-tests.sh --watch`.
