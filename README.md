@@ -1,3 +1,5 @@
+<img height="120" src="resources/logo.png" />
+
 # Infinite Monkeys
 
 Infinite Monkeys is a personal experiment to create a log book for taking daily
